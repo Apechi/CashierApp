@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cashierfe/models/Menu.dart';
+import 'package:cashierfe/models/Jenis.dart';
 import 'package:flutter/material.dart';
 import 'package:cashierfe/pages/custom_drawer.dart';
 import 'package:cashierfe/pages/custom_appbar.dart';
@@ -21,14 +22,44 @@ class _MenuState extends State<Menu> {
   void initState() {
     super.initState();
     getData();
+    getJenis();
   }
 
+  String? _selectedJenis;
   MenuData? menuData;
+  List<String> jenisList = [];
+
+  getJenis() async {
+    String url = await getBASEURLJENIS();
+    String token = await getTOKEN();
+    http.Response res = await http.get(
+      Uri.parse(url),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if (res.statusCode == 200) {
+      final jenisData = jenisDataFromJson(res.body);
+      for (var item in jenisData.data) {
+        jenisList.add({"nama_jenis": item.namaJenis, "id_jenis": item.id_jenis}
+            as String);
+      }
+      _isLoading = false;
+      setState(() {});
+    }
+  }
 
   getBASEURL() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String value = prefs.getString('BASEURL').toString();
     String url = "$value/menu";
+    return url;
+  }
+
+  getBASEURLJENIS() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String value = prefs.getString('BASEURL').toString();
+    String url = "$value/jenis";
     return url;
   }
 
@@ -52,7 +83,6 @@ class _MenuState extends State<Menu> {
 
       if (res.statusCode == 200) {
         menuData = menuDataFromJson(res.body);
-        _isLoading = false;
         setState(() {});
       }
     } catch (e) {

@@ -55,6 +55,8 @@ class Datum {
         kategori: Kategori.fromJson(json["kategori"]),
     );
 
+  get id_jenis => null;
+
     Map<String, dynamic> toJson() => {
         "id": id,
         "kategori_id": kategoriId,
