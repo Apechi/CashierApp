@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cashierfe/models/Menu.dart';
 import 'package:flutter/material.dart';
 import 'package:cashierfe/pages/custom_drawer.dart';
@@ -58,6 +60,137 @@ class _MenuState extends State<Menu> {
     }
   }
 
+  final TextEditingController categoryNameController = TextEditingController();
+
+//CREATE
+
+  Future<void> showCreateModal(BuildContext context) async {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Form(
+          child: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                Container(
+                  margin: const EdgeInsets.only(left: 20, right: 20, top: 8),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextFormField(
+                      controller: categoryNameController,
+                      decoration: const InputDecoration(
+                        labelText: "",
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.only(left: 20, right: 20, top: 8),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextFormField(
+                      controller: categoryNameController,
+                      decoration: const InputDecoration(
+                        labelText: "",
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.only(left: 20, right: 20, top: 8),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextFormField(
+                      controller: categoryNameController,
+                      decoration: const InputDecoration(
+                        labelText: "",
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.only(left: 20, right: 20, top: 8),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextFormField(
+                      controller: categoryNameController,
+                      decoration: const InputDecoration(
+                        labelText: "",
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green, // background color
+                    ),
+                    onPressed: () {
+                      // createItem(categoryNameController.text);
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Create'),
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> createItem(
+      String name, int harga, String deskripsi, int jenisId) async {
+    String url = await getBASEURL();
+    String token = await getTOKEN();
+
+    try {
+      http.Response res = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({"name": name}),
+      );
+      if (res.statusCode == 200) {
+        return getData();
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  //END CREATE
+
+  @override
+  void dispose() {
+    categoryNameController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,7 +217,7 @@ class _MenuState extends State<Menu> {
                 ),
               ),
               IconButton(
-                  onPressed: () {},
+                  onPressed: () => showCreateModal(context),
                   icon: const Icon(Icons.add, size: 37, color: Colors.green)),
             ],
           ),
