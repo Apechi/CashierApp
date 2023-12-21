@@ -38,6 +38,10 @@ dependencies:
   google_fonts: ^6.1.0
   http: ^1.1.0
   shared_preferences: ^2.2.2
+  diox: ^5.0.0
+  provider: ^6.1.1
+  curd_operation: ^0.0.1
+  flutter_hooks: ^0.20.3
 
 dev_dependencies:
   flutter_test:

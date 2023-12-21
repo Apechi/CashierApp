@@ -1,7 +1,9 @@
+import 'package:cashierfe/models/Menu.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cashierfe/pages/category/category.dart';
 import 'package:cashierfe/pages/menu/menu.dart';
+import 'package:cashierfe/pages/jenis/jenis.dart';
 
 class drawerBar extends StatelessWidget {
   const drawerBar({super.key});
@@ -60,7 +62,8 @@ class drawerBar extends StatelessWidget {
             leading: const Icon(Icons.label),
             title: const Text('Jenis'),
             onTap: () {
-              Navigator.pop(context);
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const JenisPage()));
             },
           ),
           ListTile(
