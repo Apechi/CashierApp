@@ -1,4 +1,5 @@
 import 'package:cashierfe/apiService/dioService.dart';
+import 'package:cashierfe/models/Jenis.dart';
 import 'package:cashierfe/pages/jenis/jenis.dart';
 import 'package:cashierfe/pages/menu/api_service.dart';
 import 'package:flutter/material.dart';
@@ -50,10 +51,10 @@ class MyFormJenis extends HookWidget {
 
                         return DropdownButtonFormField<int>(
                           value: selectedValue.value,
-                          items: jenisList.map((jenis) {
+                          items: data?.map((Kategori kategori) {
                             return DropdownMenuItem<int>(
-                              value: jenis.id,
-                              child: Text(jenis.namaJenis),
+                              value: kategori.id,
+                              child: Text(kategori.name),
                             );
                           }).toList(),
                           onChanged: (int? newValue) {
