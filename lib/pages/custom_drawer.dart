@@ -1,4 +1,5 @@
 import 'package:cashierfe/models/Menu.dart';
+import 'package:cashierfe/pages/stok/stok.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cashierfe/pages/category/category.dart';
@@ -70,7 +71,8 @@ class drawerBar extends StatelessWidget {
             leading: const Icon(Icons.inventory_2),
             title: const Text('Stock'),
             onTap: () {
-              Navigator.pop(context);
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const StokPage()));
             },
           ),
           ListTile(
