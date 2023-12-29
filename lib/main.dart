@@ -1,6 +1,4 @@
-import 'package:cashierfe/pages/category/category.dart';
-import 'package:cashierfe/pages/jenis/jenis.dart';
-import 'package:cashierfe/pages/menu/menu.dart';
+import 'package:cashierfe/pages/pelanggan/pelanggan.dart';
 import 'package:cashierfe/providerModels/crud.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -31,6 +29,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     saveData();
     return const MaterialApp(
-        debugShowCheckedModeBanner: false, title: 'CashierApp', home: JenisPage());
+        debugShowCheckedModeBanner: false,
+        title: 'CashierApp',
+        home: PelangganPage());
   }
 }

@@ -1,4 +1,5 @@
 import 'package:cashierfe/models/Menu.dart';
+import 'package:cashierfe/pages/pelanggan/pelanggan.dart';
 import 'package:cashierfe/pages/stok/stok.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -76,10 +77,31 @@ class drawerBar extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.person),
+            leading: const Icon(Icons.people),
             title: const Text('Pelanggan'),
             onTap: () {
-              Navigator.pop(context);
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const PelangganPage()));
+            },
+          ),
+          ListTile(
+            leading: const Icon(
+                Icons.restaurant), // Use the icon that best represents "Meja"
+            title: const Text('Meja'),
+            onTap: () {
+              Navigator.pop(
+                  context); // Replace MejaPage with the actual widget for "Meja"
+            },
+          ),
+          ListTile(
+            leading: const Icon(
+                Icons.person), // Use the icon that best represents "User"
+            title: const Text('User'),
+            onTap: () {
+              Navigator.pop(
+                  context); // Replace UserPage with the actual widget for "User"
             },
           ),
           ListTile(

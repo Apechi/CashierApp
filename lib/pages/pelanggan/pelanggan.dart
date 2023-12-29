@@ -1,24 +1,23 @@
-import 'package:cashierfe/models/Menu.dart';
+import 'package:cashierfe/models/Pelanggan.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-import 'package:cashierfe/models/Stok.dart';
+
 import 'package:cashierfe/pages/custom_drawer.dart';
 import 'package:cashierfe/pages/custom_appbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cashierfe/constant.dart';
 
-class StokPage extends StatefulWidget {
-  const StokPage({super.key});
+class PelangganPage extends StatefulWidget {
+  const PelangganPage({super.key});
 
   @override
-  State<StokPage> createState() => _StokPageState();
+  State<PelangganPage> createState() => _PelangganPageState();
 }
 
-class _StokPageState extends State<StokPage> {
-  final bool _isLoading = true;
-  late Future<StokData?> _dataFuture;
+class _PelangganPageState extends State<PelangganPage> {
+  late Future<PelangganData?> _dataFuture;
 
   @override
   void initState() {
@@ -38,7 +37,7 @@ class _StokPageState extends State<StokPage> {
 
     if (shouldDelete == null || !shouldDelete) return;
 
-    String url = "${Constant.BASE_URL}/stok";
+    String url = "${Constant.BASE_URL}/customer";
     String token = await getTOKEN();
 
     http.Response res = await http.delete(
@@ -53,8 +52,8 @@ class _StokPageState extends State<StokPage> {
     }
   }
 
-  Future<StokData?> getData() async {
-    String url = "${Constant.BASE_URL}/stok";
+  Future<PelangganData?> getData() async {
+    String url = "${Constant.BASE_URL}/customer";
     String token = await getTOKEN();
 
     try {
@@ -66,7 +65,7 @@ class _StokPageState extends State<StokPage> {
       );
 
       if (res.statusCode == 200) {
-        return stokDataFromJson(res.body);
+        return pelangganDataFromJson(res.body);
       }
     } catch (e) {
       debugPrint(e.toString());
@@ -74,33 +73,14 @@ class _StokPageState extends State<StokPage> {
     return null;
   }
 
-  Future<MenuData> getAllMenu() async {
-    String url = "${Constant.BASE_URL}/menu";
-    String token = await getTOKEN();
-
-    try {
-      http.Response res = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Authorization': 'Bearer $token',
-        },
-      );
-      if (res.statusCode == 200) {
-        return menuDataFromJson(res.body);
-      } else {
-        throw Exception('Unexpected status code ${res.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('Error while getting data');
-    }
-  }
-
   Future<void> createItem(Map<String, dynamic> item) async {
-    String url = "${Constant.BASE_URL}/stok";
+    String url = "${Constant.BASE_URL}/customer";
     String token = await getTOKEN();
 
-    String menuId = item['menu_id'].toString();
-    String jumlah = item['jumlah'].toString();
+    String nama = item['nama'].toString();
+    String email = item['email'].toString();
+    String noTelp = item['nomor_telepon'].toString();
+    String alamat = item['alamat'].toString();
 
     try {
       http.Response res = await http.post(
@@ -109,7 +89,12 @@ class _StokPageState extends State<StokPage> {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
-        body: jsonEncode({"menu_id": menuId, "jumlah": jumlah}),
+        body: jsonEncode({
+          "nama": nama,
+          "email": email,
+          "nomor_telepon": noTelp,
+          "alamat": alamat
+        }),
       );
       if (res.statusCode == 200) {
         setState(() {});
@@ -120,10 +105,12 @@ class _StokPageState extends State<StokPage> {
   }
 
   Future<void> editItem(Map<String, dynamic> data) async {
-    var id = data['id'].toString();
-    var menuId = data['menu_id'].toString();
-    var jumlah = data['jumlah'].toString();
-    String url = "${Constant.BASE_URL}/stok";
+    var id = data['id'];
+    String nama = data['nama'].toString();
+    String email = data['email'].toString();
+    String noTelp = data['nomor_telepon'].toString();
+    String alamat = data['alamat'].toString();
+    String url = "${Constant.BASE_URL}/customer";
     String token = await getTOKEN();
 
     try {
@@ -133,7 +120,12 @@ class _StokPageState extends State<StokPage> {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
-        body: jsonEncode({"menu_id": menuId, "jumlah": jumlah}),
+        body: jsonEncode({
+          "nama": nama,
+          "email": email,
+          "nomor_telepon": noTelp,
+          "alamat": alamat
+        }),
       );
       if (res.statusCode == 200) {
         setState(() {});
@@ -169,22 +161,16 @@ class _StokPageState extends State<StokPage> {
     );
   }
 
-  Future<List<DropdownMenuItem<String>>> getDropdownMenuItems() async {
-    MenuData menuData = await getAllMenu();
-    List<DropdownMenuItem<String>> menuItems = [];
-    for (var item in menuData.data) {
-      menuItems.add(DropdownMenuItem(
-        value: item.id.toString(),
-        child: Text(item.namaMenu),
-      ));
-    }
-    return menuItems;
-  }
-
-  var selectedId;
-  final TextEditingController jumlahController = TextEditingController();
+  final TextEditingController namaController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController noTelpController = TextEditingController();
+  final TextEditingController alamatController = TextEditingController();
 
   Future<void> showCreateModal(BuildContext context) async {
+    namaController.clear();
+    emailController.clear();
+    noTelpController.clear();
+    alamatController.clear();
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -192,7 +178,7 @@ class _StokPageState extends State<StokPage> {
             child: Column(
           children: <Widget>[
             Container(
-              margin: const EdgeInsets.all(20),
+              margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.black),
                 borderRadius: BorderRadius.circular(15),
@@ -200,39 +186,65 @@ class _StokPageState extends State<StokPage> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
-                  controller: jumlahController,
+                  controller: namaController,
                   decoration: const InputDecoration(
-                    labelText: "Jumlah Stok",
+                    labelText: "Nama Pelanggan",
                     border: InputBorder.none,
                   ),
                 ),
               ),
             ),
             Container(
-                margin: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black),
-                  borderRadius: BorderRadius.circular(15),
+              margin: const EdgeInsets.fromLTRB(20, 7, 20, 0),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: alamatController,
+                  decoration: const InputDecoration(
+                    labelText: "Alamat",
+                    border: InputBorder.none,
+                  ),
                 ),
-                child: FutureBuilder<List<DropdownMenuItem<String>>>(
-                  future: getDropdownMenuItems(),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<List<DropdownMenuItem<String>>> snapshot) {
-                    if (snapshot.hasData) {
-                      return DropdownButtonFormField<String>(
-                        value: selectedId,
-                        items: snapshot.data!,
-                        onChanged: (newValue) {
-                          selectedId = newValue!;
-                        },
-                      );
-                    } else if (snapshot.hasError) {
-                      return Text("${snapshot.error}");
-                    }
-                    // By default, show a loading spinner.
-                    return const CircularProgressIndicator();
-                  },
-                )),
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.fromLTRB(20, 7, 20, 0),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: noTelpController,
+                  decoration: const InputDecoration(
+                    labelText: "Nomor Telepon",
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.fromLTRB(20, 7, 20, 0),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: emailController,
+                  decoration: const InputDecoration(
+                    labelText: "Email",
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(5),
               child: ElevatedButton(
@@ -240,8 +252,12 @@ class _StokPageState extends State<StokPage> {
                   backgroundColor: Colors.green, // background color
                 ),
                 onPressed: () {
-                  createItem(
-                      {'menu_id': selectedId, 'jumlah': jumlahController.text});
+                  createItem({
+                    'nama': namaController.text,
+                    'alamat': alamatController.text,
+                    'nomor_telepon': noTelpController.text,
+                    'email': emailController.text
+                  });
                   Navigator.of(context).pop();
                 },
                 child: const Text('Create'),
@@ -255,15 +271,20 @@ class _StokPageState extends State<StokPage> {
 
   @override
   void dispose() {
-    jumlahController.dispose();
+    namaController.dispose();
+    emailController.dispose();
+    noTelpController.dispose();
+    alamatController.dispose();
     super.dispose();
   }
 
   Future<void> showEditModal(
       BuildContext context, Map<String, dynamic> data) async {
-    var selectedIdEdit = data['menu_id'].toString();
-    var itemId = data['id'];
-    jumlahController.text = data['jumlah'].toString();
+    var id = data['id'];
+    namaController.text = data['nama'].toString();
+    emailController.text = data['email'].toString();
+    noTelpController.text = data['nomor_telepon'].toString();
+    alamatController.text = data['alamat'].toString();
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -271,7 +292,7 @@ class _StokPageState extends State<StokPage> {
             child: Column(
           children: <Widget>[
             Container(
-              margin: const EdgeInsets.all(20),
+              margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.black),
                 borderRadius: BorderRadius.circular(15),
@@ -279,39 +300,65 @@ class _StokPageState extends State<StokPage> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
-                  controller: jumlahController,
+                  controller: namaController,
                   decoration: const InputDecoration(
-                    labelText: "Jumlah Stok",
+                    labelText: "Nama Pelanggan",
                     border: InputBorder.none,
                   ),
                 ),
               ),
             ),
             Container(
-                margin: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black),
-                  borderRadius: BorderRadius.circular(15),
+              margin: const EdgeInsets.fromLTRB(20, 7, 20, 0),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: alamatController,
+                  decoration: const InputDecoration(
+                    labelText: "Alamat",
+                    border: InputBorder.none,
+                  ),
                 ),
-                child: FutureBuilder<List<DropdownMenuItem<String>>>(
-                  future: getDropdownMenuItems(),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<List<DropdownMenuItem<String>>> snapshot) {
-                    if (snapshot.hasData) {
-                      return DropdownButtonFormField<String>(
-                        value: selectedIdEdit,
-                        items: snapshot.data!,
-                        onChanged: (newValue) {
-                          selectedIdEdit = newValue!;
-                        },
-                      );
-                    } else if (snapshot.hasError) {
-                      return Text("${snapshot.error}");
-                    }
-                    // By default, show a loading spinner.
-                    return const CircularProgressIndicator();
-                  },
-                )),
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.fromLTRB(20, 7, 20, 0),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: noTelpController,
+                  decoration: const InputDecoration(
+                    labelText: "Nomor Telepon",
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.fromLTRB(20, 7, 20, 0),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: emailController,
+                  decoration: const InputDecoration(
+                    labelText: "Email",
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(5),
               child: ElevatedButton(
@@ -320,9 +367,11 @@ class _StokPageState extends State<StokPage> {
                 ),
                 onPressed: () {
                   editItem({
-                    'id': itemId,
-                    'menu_id': selectedIdEdit,
-                    'jumlah': jumlahController.text
+                    'id': id,
+                    'nama': namaController.text,
+                    'alamat': alamatController.text,
+                    'nomor_telepon': noTelpController.text,
+                    'email': emailController.text
                   });
                   Navigator.of(context).pop();
                 },
@@ -340,22 +389,23 @@ class _StokPageState extends State<StokPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: const appBaru(title: "Manage Stok"),
+        appBar: const appBaru(title: "Manage Pelanggan"),
         endDrawer: const drawerBar(),
         body: Column(
           children: [
             menuAtas(),
-            listStok(context),
+            listPelanggan(context),
           ],
         ));
   }
 
-  Container listStok(BuildContext context) {
+  Container listPelanggan(BuildContext context) {
     return Container(
       margin: const EdgeInsets.fromLTRB(30, 10, 30, 0),
-      child: FutureBuilder<StokData?>(
+      child: FutureBuilder<PelangganData?>(
         future: getData(),
-        builder: (BuildContext context, AsyncSnapshot<StokData?> snapshot) {
+        builder:
+            (BuildContext context, AsyncSnapshot<PelangganData?> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Padding(
               padding: EdgeInsets.all(10.0),
@@ -366,7 +416,7 @@ class _StokPageState extends State<StokPage> {
           } else if (snapshot.hasError) {
             return const Text("Something went wrong");
           } else {
-            StokData? stokData = snapshot.data;
+            PelangganData? pelangganData = snapshot.data;
             return SizedBox(
               height: MediaQuery.of(context).size.height * 0.65,
               child: RefreshIndicator(
@@ -392,7 +442,7 @@ class _StokPageState extends State<StokPage> {
                                   Padding(
                                     padding: const EdgeInsets.all(1),
                                     child: Text(
-                                      stokData?.data[index].menu.namaMenu
+                                      pelangganData?.data[index].nama
                                               .toString() ??
                                           'N/A',
                                       style: const TextStyle(
@@ -405,7 +455,7 @@ class _StokPageState extends State<StokPage> {
                                   Padding(
                                     padding: const EdgeInsets.all(1),
                                     child: Text(
-                                      "Stok Tersisa: ${stokData?.data[index].jumlah.toString()}" ??
+                                      "Alamat: ${pelangganData?.data[index].alamat}" ??
                                           'N/A',
                                       style: const TextStyle(
                                         fontSize: 15,
@@ -414,6 +464,29 @@ class _StokPageState extends State<StokPage> {
                                       ),
                                     ),
                                   ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(1),
+                                    child: Text(
+                                      pelangganData?.data[index].email ?? 'N/A',
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(1),
+                                    child: Text(
+                                      pelangganData?.data[index].nomorTelepon ??
+                                          'N/A',
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  )
                                 ],
                               ),
                               Row(
@@ -423,9 +496,14 @@ class _StokPageState extends State<StokPage> {
                                     icon: const Icon(Icons.edit),
                                     onPressed: () {
                                       showEditModal(context, {
-                                        'id': stokData!.data[index].id,
-                                        'menu_id': stokData.data[index].menuId,
-                                        'jumlah': stokData.data[index].jumlah
+                                        'id': pelangganData!.data[index].id,
+                                        'nama': pelangganData.data[index].nama,
+                                        'email':
+                                            pelangganData.data[index].email,
+                                        'alamat':
+                                            pelangganData.data[index].alamat,
+                                        'nomor_telepon': pelangganData
+                                            .data[index].nomorTelepon
                                       });
                                     },
                                   ),
@@ -433,7 +511,7 @@ class _StokPageState extends State<StokPage> {
                                     color: Colors.red,
                                     icon: const Icon(Icons.delete),
                                     onPressed: () {
-                                      int? id = stokData?.data[index].id;
+                                      int? id = pelangganData?.data[index].id;
                                       deleteItem(id);
                                     },
                                   ),
@@ -445,7 +523,7 @@ class _StokPageState extends State<StokPage> {
                       ),
                     );
                   },
-                  itemCount: stokData?.data.length,
+                  itemCount: pelangganData?.data.length,
                 ),
               ),
             );
@@ -465,7 +543,7 @@ class _StokPageState extends State<StokPage> {
             children: [
               Container(
                 child: const Text(
-                  'Stok',
+                  'Pelanggan',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
                 ),
               ),
