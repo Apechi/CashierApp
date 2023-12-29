@@ -1,4 +1,5 @@
-import 'package:cashierfe/pages/pelanggan/pelanggan.dart';
+import 'package:cashierfe/pages/meja/meja.dart';
+
 import 'package:cashierfe/providerModels/crud.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
     saveData();
     return const MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'CashierApp',
-        home: PelangganPage());
+        title: 'CashierApp',                                                                                                                                                                                                                                                                                          
+        home: MejaPage());
   }
 }

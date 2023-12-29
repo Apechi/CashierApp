@@ -1,4 +1,5 @@
 import 'package:cashierfe/models/Menu.dart';
+import 'package:cashierfe/pages/meja/meja.dart';
 import 'package:cashierfe/pages/pelanggan/pelanggan.dart';
 import 'package:cashierfe/pages/stok/stok.dart';
 import 'package:flutter/material.dart';
@@ -91,8 +92,10 @@ class drawerBar extends StatelessWidget {
                 Icons.restaurant), // Use the icon that best represents "Meja"
             title: const Text('Meja'),
             onTap: () {
-              Navigator.pop(
-                  context); // Replace MejaPage with the actual widget for "Meja"
+            Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const MejaPage())); // Replace MejaPage with the actual widget for "Meja"
             },
           ),
           ListTile(
