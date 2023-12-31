@@ -370,7 +370,10 @@ class _StokPageState extends State<StokPage> {
             return SizedBox(
               height: MediaQuery.of(context).size.height * 0.65,
               child: RefreshIndicator(
-                onRefresh: getData,
+                onRefresh: () {
+                  setState(() {});
+                  return getData();
+                },
                 child: ListView.builder(
                   itemBuilder: (context, index) {
                     return Padding(

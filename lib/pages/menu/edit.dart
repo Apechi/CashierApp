@@ -126,6 +126,7 @@ Future<void> showEditModal(BuildContext context, Map<String, dynamic> data,
                         },
                         'PUT');
                     Navigator.of(context).pop();
+                    updateState(() {});
                   },
                   child: const Text('Save'),
                 ),

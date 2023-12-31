@@ -125,7 +125,10 @@ class MenuState extends State<Menu> {
           : SizedBox(
               height: MediaQuery.of(context).size.height * .6,
               child: RefreshIndicator(
-                onRefresh: refreshData,
+                onRefresh: () {
+                  setState(() {});
+                  return refreshData();
+                },
                 child: ListView.builder(
                   itemBuilder: (context, index) {
                     return Padding(

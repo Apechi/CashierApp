@@ -1,7 +1,7 @@
-import 'package:cashierfe/models/Pelanggan.dart';
+import 'package:cashierfe/models/User.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:http/http.dart' as http;
 
 import 'package:cashierfe/pages/custom_drawer.dart';
@@ -9,15 +9,15 @@ import 'package:cashierfe/pages/custom_appbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cashierfe/constant.dart';
 
-class PelangganPage extends StatefulWidget {
-  const PelangganPage({super.key});
+class PenggunaPage extends StatefulWidget {
+  const PenggunaPage({super.key});
 
   @override
-  State<PelangganPage> createState() => _PelangganPageState();
+  State<PenggunaPage> createState() => _PenggunaPageState();
 }
 
-class _PelangganPageState extends State<PelangganPage> {
-  late Future<PelangganData?> _dataFuture;
+class _PenggunaPageState extends State<PenggunaPage> {
+  late Future<UserData?> _dataFuture;
 
   @override
   void initState() {
@@ -37,7 +37,7 @@ class _PelangganPageState extends State<PelangganPage> {
 
     if (shouldDelete == null || !shouldDelete) return;
 
-    String url = "${Constant.BASE_URL}/customer";
+    String url = "${Constant.BASE_URL}/users";
     String token = await getTOKEN();
 
     http.Response res = await http.delete(
@@ -52,8 +52,8 @@ class _PelangganPageState extends State<PelangganPage> {
     }
   }
 
-  Future<PelangganData?> getData() async {
-    String url = "${Constant.BASE_URL}/customer";
+  Future<UserData?> getData() async {
+    String url = "${Constant.BASE_URL}/users";
     String token = await getTOKEN();
 
     try {
@@ -65,7 +65,7 @@ class _PelangganPageState extends State<PelangganPage> {
       );
 
       if (res.statusCode == 200) {
-        return pelangganDataFromJson(res.body);
+        return userDataFromJson(res.body);
       }
     } catch (e) {
       debugPrint(e.toString());
@@ -74,13 +74,12 @@ class _PelangganPageState extends State<PelangganPage> {
   }
 
   Future<void> createItem(Map<String, dynamic> item) async {
-    String url = "${Constant.BASE_URL}/customer";
+    String url = "${Constant.BASE_URL}/users";
     String token = await getTOKEN();
 
-    String nama = item['nama'].toString();
+    String name = item['name'].toString();
     String email = item['email'].toString();
-    String noTelp = item['nomor_telepon'].toString();
-    String alamat = item['alamat'].toString();
+    String password = item['password'].toString();
 
     try {
       http.Response res = await http.post(
@@ -89,15 +88,12 @@ class _PelangganPageState extends State<PelangganPage> {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
-        body: jsonEncode({
-          "nama": nama,
-          "email": email,
-          "nomor_telepon": noTelp,
-          "alamat": alamat
-        }),
+        body: jsonEncode({"name": name, "email": email, "password": password}),
       );
       if (res.statusCode == 200) {
         setState(() {});
+      } else {
+        debugPrint(res.body.toString());
       }
     } catch (e) {
       debugPrint(e.toString());
@@ -106,11 +102,11 @@ class _PelangganPageState extends State<PelangganPage> {
 
   Future<void> editItem(Map<String, dynamic> data) async {
     var id = data['id'];
-    String nama = data['nama'].toString();
+    String name = data['name'].toString();
     String email = data['email'].toString();
-    String noTelp = data['nomor_telepon'].toString();
-    String alamat = data['alamat'].toString();
-    String url = "${Constant.BASE_URL}/customer";
+    var password = data['password'].toString();
+
+    String url = "${Constant.BASE_URL}/users";
     String token = await getTOKEN();
 
     try {
@@ -120,12 +116,9 @@ class _PelangganPageState extends State<PelangganPage> {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
-        body: jsonEncode({
-          "nama": nama,
-          "email": email,
-          "nomor_telepon": noTelp,
-          "alamat": alamat
-        }),
+        body: password.isNotEmpty
+            ? jsonEncode({"name": name, "email": email, "password": password})
+            : jsonEncode({"name": name, "email": email}),
       );
       if (res.statusCode == 200) {
         setState(() {});
@@ -163,14 +156,12 @@ class _PelangganPageState extends State<PelangganPage> {
 
   final TextEditingController namaController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
-  final TextEditingController noTelpController = TextEditingController();
-  final TextEditingController alamatController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   Future<void> showCreateModal(BuildContext context) async {
     namaController.clear();
     emailController.clear();
-    noTelpController.clear();
-    alamatController.clear();
+    passwordController.clear();
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -188,41 +179,7 @@ class _PelangganPageState extends State<PelangganPage> {
                 child: TextFormField(
                   controller: namaController,
                   decoration: const InputDecoration(
-                    labelText: "Nama Pelanggan",
-                    border: InputBorder.none,
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.fromLTRB(20, 7, 20, 0),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  controller: alamatController,
-                  decoration: const InputDecoration(
-                    labelText: "Alamat",
-                    border: InputBorder.none,
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.fromLTRB(20, 7, 20, 0),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  controller: noTelpController,
-                  decoration: const InputDecoration(
-                    labelText: "Nomor Telepon",
+                    labelText: "Username",
                     border: InputBorder.none,
                   ),
                 ),
@@ -245,6 +202,23 @@ class _PelangganPageState extends State<PelangganPage> {
                 ),
               ),
             ),
+            Container(
+              margin: const EdgeInsets.fromLTRB(20, 7, 20, 0),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: passwordController,
+                  decoration: const InputDecoration(
+                    labelText: "Password",
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(5),
               child: ElevatedButton(
@@ -253,10 +227,9 @@ class _PelangganPageState extends State<PelangganPage> {
                 ),
                 onPressed: () {
                   createItem({
-                    'nama': namaController.text,
-                    'alamat': alamatController.text,
-                    'nomor_telepon': noTelpController.text,
-                    'email': emailController.text
+                    'name': namaController.text,
+                    'email': emailController.text,
+                    'password': passwordController.text,
                   });
                   Navigator.of(context).pop();
                 },
@@ -273,18 +246,17 @@ class _PelangganPageState extends State<PelangganPage> {
   void dispose() {
     namaController.dispose();
     emailController.dispose();
-    noTelpController.dispose();
-    alamatController.dispose();
+    passwordController.dispose();
+
     super.dispose();
   }
 
   Future<void> showEditModal(
       BuildContext context, Map<String, dynamic> data) async {
     var id = data['id'];
-    namaController.text = data['nama'].toString();
+    namaController.text = data['name'].toString();
     emailController.text = data['email'].toString();
-    noTelpController.text = data['nomor_telepon'].toString();
-    alamatController.text = data['alamat'].toString();
+
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -302,41 +274,7 @@ class _PelangganPageState extends State<PelangganPage> {
                 child: TextFormField(
                   controller: namaController,
                   decoration: const InputDecoration(
-                    labelText: "Nama Pelanggan",
-                    border: InputBorder.none,
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.fromLTRB(20, 7, 20, 0),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  controller: alamatController,
-                  decoration: const InputDecoration(
-                    labelText: "Alamat",
-                    border: InputBorder.none,
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.fromLTRB(20, 7, 20, 0),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  controller: noTelpController,
-                  decoration: const InputDecoration(
-                    labelText: "Nomor Telepon",
+                    labelText: "Username",
                     border: InputBorder.none,
                   ),
                 ),
@@ -359,6 +297,23 @@ class _PelangganPageState extends State<PelangganPage> {
                 ),
               ),
             ),
+            Container(
+              margin: const EdgeInsets.fromLTRB(20, 7, 20, 0),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: passwordController,
+                  decoration: const InputDecoration(
+                    labelText: "New Password",
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(5),
               child: ElevatedButton(
@@ -368,9 +323,8 @@ class _PelangganPageState extends State<PelangganPage> {
                 onPressed: () {
                   editItem({
                     'id': id,
-                    'nama': namaController.text,
-                    'alamat': alamatController.text,
-                    'nomor_telepon': noTelpController.text,
+                    'name': namaController.text,
+                    'password': passwordController.text,
                     'email': emailController.text
                   });
                   Navigator.of(context).pop();
@@ -389,23 +343,22 @@ class _PelangganPageState extends State<PelangganPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: const appBaru(title: "Manage Pelanggan"),
+        appBar: const appBaru(title: "Manage Users"),
         endDrawer: const drawerBar(),
         body: Column(
           children: [
             menuAtas(),
-            listPelanggan(context),
+            listUser(context),
           ],
         ));
   }
 
-  Container listPelanggan(BuildContext context) {
+  Container listUser(BuildContext context) {
     return Container(
       margin: const EdgeInsets.fromLTRB(30, 10, 30, 0),
-      child: FutureBuilder<PelangganData?>(
+      child: FutureBuilder<UserData?>(
         future: getData(),
-        builder:
-            (BuildContext context, AsyncSnapshot<PelangganData?> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<UserData?> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Padding(
               padding: EdgeInsets.all(10.0),
@@ -416,7 +369,7 @@ class _PelangganPageState extends State<PelangganPage> {
           } else if (snapshot.hasError) {
             return const Text("Something went wrong");
           } else {
-            PelangganData? pelangganData = snapshot.data;
+            UserData? userData = snapshot.data;
             return SizedBox(
               height: MediaQuery.of(context).size.height * 0.65,
               child: RefreshIndicator(
@@ -427,106 +380,83 @@ class _PelangganPageState extends State<PelangganPage> {
                 child: ListView.builder(
                   itemBuilder: (context, index) {
                     return Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-                      child: Card(
-                        color: const Color(0xFF77BC4D),
-                        elevation: 5,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(7),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(15.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(1),
-                                    child: Text(
-                                      pelangganData?.data[index].nama
-                                              .toString() ??
-                                          'N/A',
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(1),
-                                    child: Text(
-                                      "Alamat: ${pelangganData?.data[index].alamat}" ??
-                                          'N/A',
-                                      style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(1),
-                                    child: Text(
-                                      pelangganData?.data[index].email ?? 'N/A',
-                                      style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(1),
-                                    child: Text(
-                                      pelangganData?.data[index].nomorTelepon ??
-                                          'N/A',
-                                      style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  IconButton(
-                                    color: Colors.orange,
-                                    icon: const Icon(Icons.edit),
-                                    onPressed: () {
-                                      showEditModal(context, {
-                                        'id': pelangganData!.data[index].id,
-                                        'nama': pelangganData.data[index].nama,
-                                        'email':
-                                            pelangganData.data[index].email,
-                                        'alamat':
-                                            pelangganData.data[index].alamat,
-                                        'nomor_telepon': pelangganData
-                                            .data[index].nomorTelepon
-                                      });
-                                    },
-                                  ),
-                                  IconButton(
-                                    color: Colors.red,
-                                    icon: const Icon(Icons.delete),
-                                    onPressed: () {
-                                      int? id = pelangganData?.data[index].id;
-                                      deleteItem(id);
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ],
+                        padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                        child: Card(
+                          color: const Color(0xFF77BC4D),
+                          elevation: 5,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(7),
                           ),
-                        ),
-                      ),
-                    );
+                          child: Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(1),
+                                        child: Text(
+                                          userData?.data[index].name
+                                                  .toString() ??
+                                              'N/A',
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(1),
+                                        child: Text(
+                                          "Email: ${userData?.data[index].email}" ??
+                                              'N/A',
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          IconButton(
+                                            color: Colors.orange,
+                                            icon: const Icon(Icons.edit),
+                                            onPressed: () {
+                                              showEditModal(context, {
+                                                'id': userData!.data[index].id,
+                                                'name':
+                                                    userData.data[index].name,
+                                                'email':
+                                                    userData.data[index].email,
+                                              });
+                                            },
+                                          ),
+                                          IconButton(
+                                            color: Colors.red,
+                                            icon: const Icon(Icons.delete),
+                                            onPressed: () {
+                                              int? id =
+                                                  userData?.data[index].id;
+                                              deleteItem(id);
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ]),
+                          ),
+                        ));
                   },
-                  itemCount: pelangganData?.data.length,
+                  itemCount: userData?.data.length,
                 ),
               ),
             );
@@ -546,7 +476,7 @@ class _PelangganPageState extends State<PelangganPage> {
             children: [
               Container(
                 child: const Text(
-                  'Pelanggan',
+                  'List User',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
                 ),
               ),

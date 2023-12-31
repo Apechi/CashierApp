@@ -21,9 +21,7 @@ class _CategoryState extends State<Category> {
   void initState() {
     super.initState();
     getData();
-    
   }
-
 
   CategoryData? categoryData;
 
@@ -275,7 +273,10 @@ class _CategoryState extends State<Category> {
           : SizedBox(
               height: MediaQuery.of(context).size.height * .6,
               child: RefreshIndicator(
-                onRefresh: getData,
+                onRefresh: () {
+                  setState(() {});
+                  return getData();
+                },
                 child: ListView.builder(
                   itemBuilder: (context, index) {
                     return Padding(
