@@ -1,7 +1,6 @@
 import 'package:cashierfe/pages/meja/meja.dart';
 import 'package:cashierfe/pages/user/pengguna.dart';
 
-import 'package:cashierfe/providerModels/crud.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,7 +9,9 @@ import 'package:cashierfe/constant.dart';
 void main() {
   runApp(
     MultiProvider(providers: [
-      ChangeNotifierProvider(create: (_) => CRUDType()),
+      ChangeNotifierProvider(create: (_) {
+        {}
+      }),
     ], child: const MyApp()),
   );
 }
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
     saveData();
     return const MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'CashierApp',                                                                                                                                                                                                                                                                                          
+        title: 'CashierApp',
         home: PenggunaPage());
   }
 }
