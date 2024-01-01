@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cashierfe/constant.dart';
 import 'package:cashierfe/models/Jenis.dart';
 import 'package:cashierfe/models/Menu.dart';
 
@@ -10,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 Future<void> getData(Function updateState) async {
-  String url = await getBASEURL();
+  String url = "${Constant.BASE_URL}/menu";
   String token = await getTOKEN();
 
   try {
@@ -34,7 +35,7 @@ Future<void> getData(Function updateState) async {
 }
 
 getJenis() async {
-  String url = await getBASEURLJENIS();
+  String url = "${Constant.BASE_URL}/type";
   String token = await getTOKEN();
   http.Response res = await http.get(
     Uri.parse(url),
@@ -53,7 +54,7 @@ getJenis() async {
 
 Future<void> createItem(
     String name, int harga, String deskripsi, int jenisId, Function updateState) async {
-  String url = await getBASEURL();
+  String url = "${Constant.BASE_URL}/menu";
   String token = await getTOKEN();
 
   try {
@@ -83,7 +84,7 @@ Future<void> createItem(
 
   
 
-    String url = await getBASEURL();
+    String url = "${Constant.BASE_URL}/menu";
     String token = await getTOKEN();
 
     http.Response res = await http.delete(

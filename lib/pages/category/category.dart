@@ -1,3 +1,4 @@
+import 'package:cashierfe/constant.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:google_fonts/google_fonts.dart';
@@ -25,13 +26,6 @@ class _CategoryState extends State<Category> {
 
   CategoryData? categoryData;
 
-  getBASEURL() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String value = prefs.getString('BASEURL').toString();
-    String url = "$value/category";
-    return url;
-  }
-
   getTOKEN() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String value = prefs.getString('TOKEN').toString();
@@ -44,7 +38,7 @@ class _CategoryState extends State<Category> {
 
     if (shouldDelete == null || !shouldDelete) return;
 
-    String url = await getBASEURL();
+    String url = "${Constant.BASE_URL}/category";
     String token = await getTOKEN();
 
     http.Response res = await http.delete(
@@ -60,7 +54,7 @@ class _CategoryState extends State<Category> {
   }
 
   Future<void> getData() async {
-    String url = await getBASEURL();
+    String url = "${Constant.BASE_URL}/category";
     String token = await getTOKEN();
 
     try {
@@ -82,7 +76,7 @@ class _CategoryState extends State<Category> {
   }
 
   Future<void> createItem(String name) async {
-    String url = await getBASEURL();
+    String url = "${Constant.BASE_URL}/category";
     String token = await getTOKEN();
 
     try {
@@ -103,7 +97,7 @@ class _CategoryState extends State<Category> {
   }
 
   Future<void> editItem(String name, int? id) async {
-    String url = await getBASEURL();
+    String url = "${Constant.BASE_URL}/category";
     String token = await getTOKEN();
 
     try {

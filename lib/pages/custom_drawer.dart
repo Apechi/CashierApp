@@ -1,4 +1,5 @@
 import 'package:cashierfe/models/Menu.dart';
+import 'package:cashierfe/pages/home/home.dart';
 import 'package:cashierfe/pages/meja/meja.dart';
 import 'package:cashierfe/pages/pelanggan/pelanggan.dart';
 import 'package:cashierfe/pages/stok/stok.dart';
@@ -45,6 +46,14 @@ class drawerBar extends StatelessWidget {
                 ),
               ),
             ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.home_filled),
+            title: const Text('Home'),
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const MyHome()));
+            },
           ),
           ListTile(
             leading: const Icon(Icons.category),
